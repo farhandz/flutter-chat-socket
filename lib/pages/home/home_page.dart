@@ -40,6 +40,11 @@ class _MainPageState extends State<MainPage> {
     _pageController.jumpToPage(page);
   }
 
+  // void getAllUser() async {
+  //   _user = await _userService.getAll("632e9076a002339694b376e3", context);
+  //   print(_user.length);
+  // }
+
   @override
   void initState() {
     _pageController = PageController(initialPage: 1);
