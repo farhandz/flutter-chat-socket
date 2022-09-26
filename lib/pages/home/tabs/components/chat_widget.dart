@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:day60/models/chat/chat.dart';
+import 'package:day60/models/user/message_model.dart';
 import 'package:day60/models/user/user_model.dart';
+import 'package:day60/service/message_service.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -23,15 +25,28 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final _messageService = MessageSevice();
     final theme = Theme.of(context);
+    List<MessageModel> messagesList = <MessageModel>[];
     return ListTile(
-      onTap: () {
+      onTap: () async {
         var chat = widget.chat;
+        print(chat.email);
+        var data = await _messageService.getAllMessage(context, {
+          'from': '632e9076a002339694b376e3',
+          'to': '632e90aba002339694b376ea'
+        });
 
-        print(chat.id);
+        setState(() {
+          messagesList = data;
+        });
+
         // chat.messages = chat.messages.reversed.toList();
-        // Navigator.pushNamed(context, '/message',
-        //     arguments: {'chat': chat, 'socket': widget.socket});
+        Navigator.pushNamed(context, '/message', arguments: {
+          'chat': chat,
+          'socket': widget.socket,
+          'message': messagesList
+        });
       },
       leading: CircleAvatar(
         radius: 30,

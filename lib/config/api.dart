@@ -31,7 +31,7 @@ class Api {
   String sendMessageRoute = "$baseURL/api/messages/addmsg";
 
   // get message recive route
-  String recieveMessageRoute = "$baseURL/api/messages/getmsg";
+  String recieveMessageRoute = "http://192.168.65.38:5000/api/messages/getmsg";
 
   // set avatarRoute
   String setAvatarRoute = "$baseURL/api/auth/setavatar";

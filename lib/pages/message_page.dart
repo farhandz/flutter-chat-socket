@@ -1,6 +1,9 @@
 import 'package:day60/models/chat/chat.dart';
 import 'package:day60/models/message/message.dart';
+import 'package:day60/models/user/message_model.dart';
+import 'package:day60/models/user/user_model.dart';
 import 'package:day60/pages/home/tabs/components/message_widget.dart';
+import 'package:day60/service/message_service.dart';
 import 'package:day60/shared/constants/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
@@ -14,10 +17,12 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> with AnimationMixin {
-  late Chat chat;
+  late UserModel chat;
   late IO.Socket socket;
+  late List<MessageModel> messageLists;
   late final textController = TextEditingController();
   final _scrollController = ScrollController();
+  final _messageService = MessageSevice();
 
   late Animation<double> opacity;
   late AnimationController slideInputController;
@@ -42,14 +47,12 @@ class _MessagePageState extends State<MessagePage> with AnimationMixin {
 
   addToMessages(String text) {
     setState(() {
-      chat.messages.insert(
-          0,
-          Message(
-            id: chat.messages.length + 1,
-            text: text,
-            createdAt: 'Just now',
-            isMe: true,
-          ));
+      messageLists.insert(0, MessageModel(fromSelf: true, message: text));
+    });
+    _messageService.addMessage(context, {
+      'from': '632e9076a002339694b376e3',
+      'to': '632e90aba002339694b376ea',
+      'message': text
     });
   }
 
@@ -74,8 +77,9 @@ class _MessagePageState extends State<MessagePage> with AnimationMixin {
     final theme = Theme.of(context);
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
-    chat = arguments['chat'] as Chat;
+    chat = arguments['chat'];
     socket = arguments['socket'] as IO.Socket;
+    messageLists = arguments['message'] as List<MessageModel>;
     return Scaffold(
       backgroundColor: ColorConstants.lightBackgroundColor,
       appBar: AppBar(
@@ -86,12 +90,12 @@ class _MessagePageState extends State<MessagePage> with AnimationMixin {
         titleSpacing: 0,
         title: ListTile(
           onTap: () {},
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(
-              chat.user.profile,
-            ),
-          ),
-          title: Text(chat.user.name, style: theme.textTheme.headline6),
+          // leading: CircleAvatar(
+          //   backgroundImage: NetworkImage(
+          //     chat.user.profile,
+          //   ),
+          // ),
+          // title: Text(chat.user.name, style: theme.textTheme.headline6),
           subtitle: Text('last seen yesterday at 21:05',
               style: theme.textTheme.bodySmall),
         ),
@@ -124,16 +128,17 @@ class _MessagePageState extends State<MessagePage> with AnimationMixin {
             child: Column(
               children: [
                 Expanded(
-                  child: chat.messages.length > 0
+                  child: messageLists.length > 0
                       ? ListView.builder(
                           reverse: true,
                           shrinkWrap: true,
                           controller: _scrollController,
                           padding: EdgeInsets.symmetric(vertical: 8),
-                          itemCount: chat.messages.length,
+                          itemCount: messageLists.length,
                           itemBuilder: (context, index) {
+                            // return Text("asas");
                             return MessageWidget(
-                              message: chat.messages[index],
+                              message: messageLists[index],
                             );
                           },
                         )
