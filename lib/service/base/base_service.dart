@@ -48,7 +48,7 @@ class BaseServices {
             break;
           case 401:
             print('401 - Unauthorized.');
-            break;
+            return Navigator.pushNamed(context, '/login');
           case 500:
             print('500 - Internal Server Error.');
             break;
